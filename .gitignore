@@ -1,0 +1,7 @@
+*.elf
+*.map
+*.jpg
+*.bit
+*.nds
+
+debug_error.html
