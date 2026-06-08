@@ -10,7 +10,9 @@ A high-performance, hardware-accelerated 3x Ultra-HD comic book reader for the N
 
 `ds-mangaman` は、完璧なエンドツーエンドのアーキテクチャにより、レトロハードウェアの物理的制約を完全に打ち破ります。さらにニンテンドーDS実機上では、低層の C++ 固定小数点数によるハードウェア加速を通じて、かつてない 3倍超高画質のデュアルスクリーン動的マンガ閲覧体験を実現しました。これは単なるパフォーマンスの最適化に留まらず、旧世代のハードウェアに現代のデジタル資産の生命力を吹き込む、究極のソリューションです。
 
-![demo](./demo.jpg)
+<div align="center">
+  <img src="./demo.jpg" width="50%" alt="demo演示デモ">
+</div>
 
 ## Features
 
