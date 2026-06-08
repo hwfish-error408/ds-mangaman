@@ -16,7 +16,7 @@ A high-performance, hardware-accelerated 3x Ultra-HD comic book reader for the N
 
 ## Features
 
-* **3x Ultra-HD Rendering Matrix**: Converts source images into high-fidelity 768x576 assets, providing raw details that far exceed standard NDS screen limitations.
+* **3x Ultra-HD Rendering Matrix**: Converts source images into native 768x576 assets, providing raw details that far exceed standard NDS screen limitations.
 * **Dual-Screen Layout**: The bottom touch screen shows the current page in thumbnail view, while the top screen displays a preview of the upcoming page for a seamless transition.
 * **Touch Radar Magnifier**: Pressing the stylus on the bottom screen instantly shifts the top screen into an ultra-high-resolution magnifying glass focused on the exact pixel coordinates, paired with a dynamic tracking bounding box.
 * **Hardware-Accelerated Scaling**: Implements 16-bit fixed-point nearest-neighbor interpolations directly inside the ARM9 main loop, providing clean, high-performance image scaling without floating-point overhead.
