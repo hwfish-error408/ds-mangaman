@@ -65,8 +65,8 @@ def process_image(img_path, out_chap_dir, idx):
     create_padded_bin_vectorized(img_cw, 768, 576, full_path)
 
 def build_nds_project(start_code, end_code):
-    src_base = 'build/jpg_comic'
-    out_base = 'build/nitrofiles'
+    src_base = 'assets/jpg_comic'
+    out_base = 'assets/nitrofiles'
     build_target = f"build/{start_code}_{end_code}"
     
     if not os.path.exists(src_base):

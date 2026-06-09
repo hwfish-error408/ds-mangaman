@@ -56,7 +56,7 @@ export LIBPATHS :=  $(foreach dir,$(LIBDIRS),-L$(dir)/lib)
 
 $(BUILD):
 	@[ -d $@ ] || mkdir -p $@
-	@$(MAKE) --no-print-directory -C $(BUILD) -f $(CURDIR)/Makefile NITRO_FILES=$(CURDIR)/nitrofiles
+	@$(MAKE) --no-print-directory -C $(BUILD) -f $(CURDIR)/Makefile NITRO_FILES=$(CURDIR)/assets/nitrofiles
 
 clean:
 	@echo clean ...

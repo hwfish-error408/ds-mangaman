@@ -1,7 +1,10 @@
 *.elf
 *.map
 *.jpg
-*.bit
+*.bin
 *.nds
+*.exe
 
 debug_error.html
+
+build/**
