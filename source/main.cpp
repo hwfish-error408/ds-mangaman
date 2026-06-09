@@ -25,7 +25,6 @@ static u16 zoom_buffer[CROP_W * CROP_H] __attribute__((aligned(4)));
 static const float ZOOM_LEVELS[] = {1.5f, 2.0f, 2.5f, 3.0f};
 static int current_zoom_idx = 3; 
 
-// ================= [Automated Dynamic Chapter Search Pool] =================
 static int valid_chapters[256]; // Supports up to 256 chapters per ROM theoretically
 static int total_chapters = 0;
 static int current_chapter_idx = 0; // Index of the currently read chapter in the search pool
@@ -61,7 +60,10 @@ void scan_and_sort_chapters() {
         }
     }
 }
-// =========================================================================
+
+
+
+
 
 bool is_file_exist(int chapter, int page, const char* suffix) {
     char file_path[64];
@@ -183,7 +185,6 @@ int main(void) {
         while(1) swiWaitForVBlank();
     }
 
-    // Scan on boot to retrieve all valid chapter numbers
     scan_and_sort_chapters();
     
     if (total_chapters == 0) {
