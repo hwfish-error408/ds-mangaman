@@ -4,7 +4,6 @@
 *.bin
 *.nds
 *.exe
-
-debug_error.html
+devkitProUpdate.*
 
 build/**
