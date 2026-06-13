@@ -1,9 +1,13 @@
+# build shit
+build/
 *.elf
 *.map
-*.jpg
-*.bin
 *.nds
+
+# toolbox shit
 *.exe
 devkitProUpdate.*
 
-build/**
+# assets shit
+assets/jpg_comic/
+assets/nitrofiles/

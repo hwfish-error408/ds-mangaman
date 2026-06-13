@@ -14,7 +14,7 @@ DEVKITPRO_ROOT = None
 MAKE_EXECUTABLE_PATH = "make"
 
 def verify_toolchain_infrastructure():
-    """Validates the hardware toolchain footprint without overriding global environment profiles."""
+    """Validates the hardware toolchain footprint and injects standard paths into environment."""
     global DEVKITPRO_ROOT, MAKE_EXECUTABLE_PATH
     
     possible_roots = [
@@ -30,6 +30,27 @@ def verify_toolchain_infrastructure():
             break
             
     if DEVKITPRO_ROOT:
+        clean_root = DEVKITPRO_ROOT.replace('\\', '/')
+        
+        os.environ['DEVKITPRO'] = clean_root
+        os.environ['DEVKITARM'] = f"{clean_root}/devkitARM"
+        
+        devkitarm_bin = f"{clean_root}/devkitARM/bin"
+        msys2_bin = f"{clean_root}/msys2/usr/bin"
+        tools_bin = f"{clean_root}/tools/bin"
+        
+        current_path = os.environ.get('PATH', '')
+        toolchain_paths = [devkitarm_bin, msys2_bin, tools_bin]
+        
+        new_paths = [p for p in toolchain_paths if p not in current_path]
+        if new_paths:
+            os.environ['PATH'] = ";".join(new_paths) + ";" + current_path
+        
+        print(f">>>Environment variables injected:")
+        print(f"       DEVKITPRO = {os.environ['DEVKITPRO']}")
+        print(f"       DEVKITARM = {os.environ['DEVKITARM']}")
+        print(f"       PATH Altered")
+
         msys_make = os.path.join(DEVKITPRO_ROOT, 'msys2', 'usr', 'bin', 'make.exe')
         if os.path.exists(msys_make):
             MAKE_EXECUTABLE_PATH = msys_make
