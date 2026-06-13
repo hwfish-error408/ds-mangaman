@@ -4,10 +4,6 @@ build/
 *.map
 *.nds
 
-# toolbox shit
-*.exe
-devkitProUpdate.*
-
 # assets shit
 assets/jpg_comic/
 assets/nitrofiles/
