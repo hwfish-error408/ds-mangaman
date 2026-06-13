@@ -14,6 +14,11 @@ DS Mangamanは、完美なエンドツーエンドのアーキテクチャによ
   <img src="./demo/demo.jpg" width="50%" alt="demo演示デモ">
 </div>
 
+## Common Issues
+
+* **File Path Spaces (Compilation Failure)**: The devkitPro toolchain and GNU `make` cannot handle directory paths containing spaces (e.g., `C:\Users\Charles Wong\Downloads`). If you encounter a `No rule to make target` error, simply move the entire project folder to a path with no spaces, such as `C:\ds_mangaman\` or `D:\ds_mangaman\`.
+**Mandatory Installation Path (Detection Failure)**: The script validates environmental footprints using a hardcoded array of default paths, targeting `C:\devkitPro`. Installing the development toolchain into a custom path or alternative drive letter is the same as not installing; if a non-default directory is explicitly required, open a GitHub Issue so administrators can append your custom path matrix to the lookup table.
+
 ## Features
 
 * **Flashcard & Virtual Filesystem Independence**: By embedding manga assets directly into the inner `.nds` ROM structure via NitroFS, the system bypasses any reliance on specific R4 card FAT kernels, or external virtual filesystem clusters, meaning that it's stable on all avaliable flashcart platforms.
