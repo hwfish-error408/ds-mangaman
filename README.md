@@ -25,21 +25,9 @@ DS Mangamanは、完美なエンドツーエンドのアーキテクチャによ
 * **3x Ultra-HD Rendering Matrix**: Converts source images into 768x576 assets, providing raw details that far exceed standard NDS screen limitations.
 * **Touch Radar Magnifier**: Pressing the stylus on the bottom screen instantly shifts the top screen into an ultra-high-resolution magnifying glass focused on the exact pixel coordinates, paired with a dynamic tracking bounding box.
 
-## Project Structure
 
-To allow users without a local Python environment to easily compile ROMs, the frontend controller has been packaged into a standalone desktop executable. Please ensure the distribution package maintains the following directory structure:
 
-```
-ds-mangaman/
-├── main_gui.exe (Pre-compiled desktop GUI tool with built-in Python environment)
-├── Makefile (Core compiler orchestration and build rules)
-├── source/
-│   └── main.cpp (Main application logic: dual-screen rendering, touch radar, and NitroFS controls)
-├── build/
-└── assets/
-    ├── devkitProUpdater-3.0.3.exe (Bundled development chain offline setup executable)
-    └── jpg_comic/ (Manga source directory, automatically initialized upon first launch)
-```
+
 
 ---
 
