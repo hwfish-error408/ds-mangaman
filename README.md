@@ -1,86 +1,78 @@
-# ds-mangaman
+# DS Mangaman
 
-A high-performance, hardware-accelerated 3x Ultra-HD comic book reader for the Nintendo DS. It includes a Python preprocessing pipeline supporting a dedicated Chrome Extension to bypass modern anti-scraping walls.
-
----
-
-通过完美的端到端架构，`ds-mangaman` 彻底打破了复古硬件的物理制约。在任天堂 DS 掌机上通过底层 C++ 定点数硬件加速，实现了前所未有的 3 倍超清双屏动态无损漫画阅读体验。这不仅是一次卓越的逆向性能调优，更是一套将现代高精数字化资产无缝注入老旧硬件的终极闭环解决方案。
+A high-performance, hardware-accelerated 3x Ultra-HD comic book reader for the Nintendo DS. It includes an integrated Python-based preprocessing pipeline packaged into a standalone desktop GUI tool.
 
 ---
 
-`ds-mangaman` は、完璧なエンドツーエンドのアーキテクチャにより、レトロハードウェアの物理的制約を完全に打ち破ります。さらにニンテンドーDS実機上では、低層の C++ 固定小数点数によるハードウェア加速を通じて、かつてない 3倍超高画質のデュアルスクリーン動的マンガ閲覧体験を実現しました。これは単なるパフォーマンスの最適化に留まらず、旧世代のハードウェアに現代のデジタル資産の生命力を吹き込む、究極のソリューションです。
+通过完美的端到端架构，DS Mangaman 彻底打破了复古硬件的物理制约。在任天堂 DS 掌机上通过底层 C++ 定点数硬件加速，实现了前所未有的 3 倍超清双屏动态无损漫画阅读体验。这不仅是一次卓越的逆向性能调优，更是一套将现代高精数字化资产无缝注入老旧硬件的终极闭环解决方案。
+
+---
+
+DS Mangamanは、完美なエンドツーエンドのアーキテクチャにより、レトロハードウェアの物理的制約を完全に打ち破ります。さらにニンテンドーDS実機上では、低層の C++ 固定小数点数によるハードウェア加速を通じて、かつてない 3倍超高画質のデュアルスクリーン動的マンガ閲覧体験を実現しました。これは単なるパフォーマンスの最適化に留まらず、旧世代 of ハードウェアに現代のデジタル資産の生命力を吹き込む、究極のソリューションです。
 
 <div align="center">
-  <img src="./demo.jpg" width="50%" alt="demo演示デモ">
+  <img src="./demo/demo.jpg" width="50%" alt="demo演示デモ">
 </div>
 
 ## Features
 
+* **Flashcard & Virtual Filesystem Independence**: By embedding manga assets directly into the inner `.nds` ROM structure via NitroFS, the system bypasses any reliance on specific R4 card FAT kernels, or external virtual filesystem clusters, meaning that it's stable on all avaliable flashcart platforms.
 * **3x Ultra-HD Rendering Matrix**: Converts source images into 768x576 assets, providing raw details that far exceed standard NDS screen limitations.
-* **Dual-Screen Layout**: The bottom touch screen shows the current page in thumbnail view, while the top screen displays a preview of the upcoming page for a seamless transition.
 * **Touch Radar Magnifier**: Pressing the stylus on the bottom screen instantly shifts the top screen into an ultra-high-resolution magnifying glass focused on the exact pixel coordinates, paired with a dynamic tracking bounding box.
-* **Hardware-Accelerated Scaling**: Implements 16-bit fixed-point nearest-neighbor interpolations directly inside the ARM9 main loop, providing clean, high-performance image scaling without floating-point overhead.
-* **Dynamic Chapter indexing**: The NDS runtime automatically scans, processes, and sorts 4-digit non-sequential chapter folders on boot via NitroFS, allowing irregular chapter progression (e.g., jumping from `0030` to `0032`).
 
 ## Project Structure
 
-```text
+To allow users without a local Python environment to easily compile ROMs, the frontend controller has been packaged into a standalone desktop executable. Please ensure the distribution package maintains the following directory structure:
+
+```
 ds-mangaman/
-├── build/             # Temporary compiler object files
-│   ├── jpg_comic/         # Local workspace for raw images downloaded via extension
-│   │   ├── 0010/          # Chapter 1 (Strictly named 001.jpg, 002.jpg...)
-│   │   └── 0032/          # Chapter 3b
-│   └── nitrofiles/        # Compiled little-endian 16-bit binary matrix outputs
-├── source/            # NDS C++ source files
-│   └── main.cpp       # Main application execution, touch HUD & NitroFS control
-├── Makefile           # Native devkitARM compilation configuration rules
-└── pack.py            # NumPy-accelerated image converter & pipeline script\
+├── main_gui.exe (Pre-compiled desktop GUI tool with built-in Python environment)
+├── Makefile (Core compiler orchestration and build rules)
+├── source/
+│   └── main.cpp (Main application logic: dual-screen rendering, touch radar, and NitroFS controls)
+├── build/
+└── assets/
+    ├── devkitProUpdater-3.0.3.exe (Bundled development chain offline setup executable)
+    └── jpg_comic/ (Manga source directory, automatically initialized upon first launch)
 ```
 
-## How to Build
+---
 
-To compile `ds_mangaman` and bundle your own manga into a playable `.nds` ROM, you need to set up the **devkitPro** toolchain and the **Python** preprocessing environment.
+## Usage Tutorial
 
-### Nintendo DS Toolchain: devkitPro
-We use the official **devkitPro** ecosystem to compile C++ code. Ensure you have the following components installed:
-* **devkitARM**: The GNU compiler toolchain (GCC/G++) targeted for ARM processors.
-* **libnds**: The core hardware interface library providing NDS-specific registers, video modes, and NitroFS filesystem hooks.
-* **Calico OS**: The modern microkernel/threading library utilized by this project for system tasks.
+You no longer need to manually configure Python, pip, or global environment variables via the command line. Follow these steps to generate your custom comic `.nds` ROM on any Windows PC.
 
-### PC Asset: Python 3
-A Python script automates the manga page transcoding process.
-* **Python 3.x**: Installed and added to your system `PATH`.
-* **Pillow (PIL)**: The image processing library used to resize panels to NDS native 256x192 resolution and convert RGB888 to hardware-accelerated 16-bit RGB555 format.
-  ```bash
-  pip install Pillow
+<div align="center">
+  <img src="./demo/gui_demo.jpg" width="50%" alt="demo演示デモ">
+</div>
 
-### Environment Variables
-This project relies on standard devkitPro environment variables. If you encounter compilation errors (such as ld.exe hijacking by external MSYS2/MinGW setups), verify you have such Windows System Environment Variables set up:
-- `DEVKITPRO = C:/devkitpro`
-- `DEVKITARM = C:/devkitpro/devkitARM`
+### Step 1: Toolchain Setup
+The compilation pipeline relies on the official devkitPro build ecosystem.
+1. Double-click to run `main_gui.exe` in the release package. If the development toolchain is not detected on your local drives, the application will automatically pop up a dialog to guide you through the setup process.
+2. Alternatively, you can directly execute `assets/devkitProUpdater-3.0.3.exe`. In the component selection window, make sure that NDS Development is checked.
+3. **Mandatory Installation Path (CRITICAL):** You MUST keep the default installation directory as `C:\devkitPro`! Do not customize or change the path to other drive letters during the installation wizard, otherwise the orchestration program will fail to intercept and dynamically inject the active build environments.
+4. **Special Requirements Note:** If you have absolute hardware installation constraints and must change the installation drive or path, please submit an Issue directly on the GitHub project page. Administrator will append your custom path to the automatic detection lookup table in the next release.
 
-### Compilation
-Place your raw manga chapters into the 'build/jpg_comic/` directory. Structure them using four-digit subfolders (the last digit stands for sub-chapter index) for proper chapter grouping:
-```text
-jpg_comic/
-├── 0010/
+### Step 2: Import Manga Assets
+1. Click the **Import** button on the graphical user interface. The application will automatically open your local manga repository directory located at `assets/jpg_comic/`.
+2. Create subfolders strictly named with **4-digit integers** to represent chapter identifiers (e.g., name Chapter 1 as `0010`, Chapter 2 as `0020`, etc.).
+3. Place your manga panels into their respective folders. Images must be sorted sequentially by page numbers (mainstream modern formats such as `.jpg`, `.png`, and `.webp` are fully supported). I will upload a web manga downloader chrome extension shortly (mainly for major english and traditional chinese pirate websites) making it a lot easier.
+
+```
+assets/jpg_comic/
+├── 0010/ (Chapter 1 folder)
 │   ├── 001.jpg
 │   ├── 002.jpg
-├── 0020/
-│   ├── 001.png
-└── 0021/
-    └── 001.jpg
+└── 0022/ (Chapter 2b folder)
+    ├── 001.png
+    └── 002.png
 ```
 
-### Run the Pipeline
-Open command terminal in the project root directory and execute:
-```bash
-make clean
-python pack.py
-```
-The Python script will:
-- Process all images into hardware-native .bin streams under nitrofiles/.
-- Automatically invoke make.
-- Call ndstool to inject the NitroFS file system into the final binary.
-
-Upon successful execution, you can find the `.nds` file in the `build` directory.
+### Step 3: Package & Generate ROM
+1. Once your images are properly placed, return to the GUI and click the **Refresh** button. The chapter list view on the right will update to display your detected chapter IDs and total page counts.
+2. **Select Compilation Target:**
+   * You can multi-select any subset of chapters in the list by holding down `Ctrl` or `Shift` to package a custom set of chapters into the ROM.
+   * If no specific items are selected, clicking compile will automatically package all discovered chapters in the list.
+3. Click the **Gen ROM** button.
+4. **Automated Closed-Loop Execution:** The main program will handle NumPy-accelerated image rotation and compression, transcode RGB888 source images to hardware-native 16-bit RGB555 format, build the NitroFS filesystem structure, and silently invoke the underlying devkitARM compiler tools.
+5. Upon successful compilation, the software will automatically open the `build/` directory for you, revealing your newly generated `.nds` ROM file ready to be loaded into your NDS flashcard or emulator!
