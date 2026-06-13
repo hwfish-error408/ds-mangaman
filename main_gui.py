@@ -10,6 +10,11 @@ from tkinter import messagebox, ttk, scrolledtext
 from PIL import Image
 import numpy as np
 
+if getattr(sys, 'frozen', False):
+    BASE_DIR = os.path.dirname(sys.executable)
+else:
+    BASE_DIR = os.path.dirname(os.path.abspath(__file__))
+
 DEVKITPRO_ROOT = None
 MAKE_EXECUTABLE_PATH = "make"
 
@@ -46,10 +51,7 @@ def verify_toolchain_infrastructure():
         if new_paths:
             os.environ['PATH'] = ";".join(new_paths) + ";" + current_path
         
-        print(f">>>Environment variables injected:")
-        print(f"       DEVKITPRO = {os.environ['DEVKITPRO']}")
-        print(f"       DEVKITARM = {os.environ['DEVKITARM']}")
-        print(f"       PATH Altered")
+        print(f"[TOOLCHAIN] 动态环境变量注入成功。")
 
         msys_make = os.path.join(DEVKITPRO_ROOT, 'msys2', 'usr', 'bin', 'make.exe')
         if os.path.exists(msys_make):
@@ -60,7 +62,7 @@ def verify_toolchain_infrastructure():
     root_win = tk.Tk()
     root_win.withdraw()
     
-    installer_path = os.path.join('assets', 'devkitProUpdater-3.0.3.exe')
+    installer_path = os.path.join(BASE_DIR, 'assets', 'devkitProUpdater-3.0.3.exe')
     
     alert_msg = (
         "devkitPro toolchain directory not detected on your local storage drives!\n\n"
@@ -149,8 +151,8 @@ class DSComicViewerGUI:
             '*.tiff', '*.tif', '*.gif', '*.avif', '*.heic'
         ]
         
-        self.src_base = 'assets/jpg_comic'
-        self.out_base = 'assets/nitrofiles'
+        self.src_base = os.path.join(BASE_DIR, 'assets', 'jpg_comic')
+        self.out_base = os.path.join(BASE_DIR, 'assets', 'nitrofiles')
         os.makedirs(self.src_base, exist_ok=True)
         os.makedirs(self.out_base, exist_ok=True)
         
@@ -323,7 +325,7 @@ class DSComicViewerGUI:
             
             proc = subprocess.Popen(
                 make_command, stdout=subprocess.PIPE, stderr=subprocess.STDOUT, 
-                text=True, shell=True
+                text=True, shell=True, cwd=BASE_DIR
             )
             
             while True:
