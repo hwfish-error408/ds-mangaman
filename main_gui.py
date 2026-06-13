@@ -10,13 +10,9 @@ from tkinter import messagebox, ttk, scrolledtext
 from PIL import Image
 import numpy as np
 
-# Global storage for the verified paths
 DEVKITPRO_ROOT = None
-MAKE_EXECUTABLE_PATH = "make"  # Fallback to system path default
+MAKE_EXECUTABLE_PATH = "make"
 
-# ==========================================
-# 1. PHYSICAL TOOLCHAIN & BINARY VALIDATION
-# ==========================================
 def verify_toolchain_infrastructure():
     """Validates the hardware toolchain footprint without overriding global environment profiles."""
     global DEVKITPRO_ROOT, MAKE_EXECUTABLE_PATH
@@ -34,14 +30,12 @@ def verify_toolchain_infrastructure():
             break
             
     if DEVKITPRO_ROOT:
-        # Resolve absolute location of the bundled MSYS2 make binary to prevent Windows PATH execution failures
         msys_make = os.path.join(DEVKITPRO_ROOT, 'msys2', 'usr', 'bin', 'make.exe')
         if os.path.exists(msys_make):
             MAKE_EXECUTABLE_PATH = msys_make
             print(f"[TOOLCHAIN] Found internal build utility: {MAKE_EXECUTABLE_PATH}")
         return True
 
-    # Alert handling if the installation path cannot be verified
     root_win = tk.Tk()
     root_win.withdraw()
     
@@ -66,13 +60,9 @@ def verify_toolchain_infrastructure():
     root_win.destroy()
     sys.exit(0)
 
-# Run verification checks prior to UI window allocation
 verify_toolchain_infrastructure()
 
 
-# ==========================================
-# 2. IMAGE COMPRESSION PIPELINE (PACK.PY)
-# ==========================================
 def clear_output_directory(dir_path):
     """Purges past matrix caches from the output workspace directory."""
     if os.path.exists(dir_path):
@@ -126,17 +116,13 @@ def process_image(img_path, out_chap_dir, idx):
     create_padded_bin_vectorized(img_cw, 768, 576, full_path)
 
 
-# ==========================================
-# 3. INTERACTIVE MANGA CONTEXT MANAGER GUI
-# ==========================================
 class DSComicViewerGUI:
     def __init__(self, root):
         self.root = root
         self.root.title("DS-Mangaman")
-        self.root.geometry("600x500")  # 锁定 500 * 500 分辨率
+        self.root.geometry("600x500")
         self.root.minsize(600, 500)
         
-        # Extended multi-format compatibility matrix
         self.supported_extensions = [
             '*.jpg', '*.jpeg', '*.png', '*.bmp', '*.webp', 
             '*.tiff', '*.tif', '*.gif', '*.avif', '*.heic'
@@ -151,34 +137,24 @@ class DSComicViewerGUI:
         self.refresh_chapter_list()
 
     def ui_setup(self):
-        # 创建统一样式，使顶部按钮文字加粗显得更大
         style = ttk.Style()
         style.configure("Large.TButton", font=("Consolas", 11))
 
-        # ----------------------------------------------------
-        # 【新架构】顶部大按钮区域：独占一整行，平分拉满宽度
-        # ----------------------------------------------------
         top_bar = ttk.Frame(self.root, padding=6)
         top_bar.pack(side=tk.TOP, fill=tk.X)
         
-        # 仅保留 📁 和 ↻ 表情，统一增加 ipady 让按钮体积显著变大
         btn_import = ttk.Button(top_bar, text="📁 Import", style="Large.TButton", command=self.open_manga_dir)
         btn_import.pack(side=tk.LEFT, fill=tk.X, expand=True, padx=2, ipady=8)
         
         btn_refresh = ttk.Button(top_bar, text="↻ Refresh", style="Large.TButton", command=self.refresh_chapter_list)
         btn_refresh.pack(side=tk.LEFT, fill=tk.X, expand=True, padx=2, ipady=8)
         
-        # 去掉了原先的齿轮 ⚙️ 表情
         self.btn_compile = ttk.Button(top_bar, text="Gen ROM", style="Large.TButton", command=self.trigger_compilation)
         self.btn_compile.pack(side=tk.LEFT, fill=tk.X, expand=True, padx=2, ipady=8)
 
-        # ----------------------------------------------------
-        # 下半部分主容器：承载中下部的双栏分列
-        # ----------------------------------------------------
         main_body = ttk.Frame(self.root)
         main_body.pack(side=tk.TOP, fill=tk.BOTH, expand=True)
 
-        # 右侧分列：章节管理数据表格 (固定紧凑宽度 170px)
         right_frame = ttk.Frame(main_body, padding=6)
         right_frame.pack(side=tk.RIGHT, fill=tk.Y, expand=False)
         
@@ -201,7 +177,6 @@ class DSComicViewerGUI:
         scroll.pack(side=tk.RIGHT, fill=tk.Y)
         self.tree.pack(fill=tk.BOTH, expand=True, side=tk.TOP)
 
-        # 左侧分列：控制台终端日志输出 (横向动态填满剩余空间)
         left_frame = ttk.Frame(main_body, padding=6)
         left_frame.pack(side=tk.LEFT, fill=tk.BOTH, expand=True)
         
