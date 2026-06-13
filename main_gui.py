@@ -1,13 +1,17 @@
 import os
 import sys
-import glob
 import shutil
+import glob
 import platform
 import subprocess
+
 import threading
+
 import tkinter as tk
 from tkinter import messagebox, ttk, scrolledtext
+
 from PIL import Image
+
 import numpy as np
 
 if getattr(sys, 'frozen', False):
@@ -22,12 +26,7 @@ def verify_toolchain_infrastructure():
     """Validates the hardware toolchain footprint and injects standard paths into environment."""
     global DEVKITPRO_ROOT, MAKE_EXECUTABLE_PATH
     
-    possible_roots = [
-        'C:\\devkitPro',
-        'C:\\devkitpro',
-        'D:\\devkitPro',
-        'd:\\devkitpro'
-    ]
+    possible_roots = [ 'C:\\devkitPro', 'C:\\devkitpro', 'D:\\devkitPro', 'd:\\devkitpro' ]
     
     for root in possible_roots:
         if os.path.exists(os.path.join(root, 'devkitARM')) and os.path.exists(os.path.join(root, 'libnds')):
@@ -51,12 +50,12 @@ def verify_toolchain_infrastructure():
         if new_paths:
             os.environ['PATH'] = ";".join(new_paths) + ";" + current_path
         
-        print(f"[TOOLCHAIN] 动态环境变量注入成功。")
+        print(f"[GUI] Environment variable injected")
 
         msys_make = os.path.join(DEVKITPRO_ROOT, 'msys2', 'usr', 'bin', 'make.exe')
         if os.path.exists(msys_make):
             MAKE_EXECUTABLE_PATH = msys_make
-            print(f"[TOOLCHAIN] Found internal build utility: {MAKE_EXECUTABLE_PATH}")
+            print(f"[GUI] Found internal build utility: {MAKE_EXECUTABLE_PATH}")
         return True
 
     root_win = tk.Tk()
@@ -338,6 +337,12 @@ class DSComicViewerGUI:
             return_code = proc.poll()
             if return_code == 0:
                 self.print_log(f"\n[PIPELINE] Target ROM binary built successfully: {target_rom_path}.nds")
+
+                build_dir = os.path.abspath(os.path.join(BASE_DIR, 'build'))
+                if platform.system() == "Windows":
+                    os.startfile(build_dir)
+                else:
+                    subprocess.Popen(["xdg-open", build_dir])
             else:
                 self.print_log(f"\n[PIPELINE] Compiler chain broken. Exit code: {return_code}")
                 
