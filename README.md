@@ -29,7 +29,6 @@ DS Mangamanは、完美なエンドツーエンドのアーキテクチャによ
 
 
 
----
 
 ## Usage Tutorial
 
