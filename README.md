@@ -1,3 +1,13 @@
+```
+Touch screen      -->      Zoom in
+D-pad up          -->      Next page
+D-pad down        -->      Last page
+L                 -->      Next chapter
+R                 -->      Last chapter
+START             -->      Decrease zoom ratio
+SELECT            -->      Increase zoom ratio
+```
+
 # DS Mangaman
 
 A high-performance, hardware-accelerated 3x Ultra-HD comic book reader for the Nintendo DS. It includes an integrated Python-based preprocessing pipeline packaged into a standalone desktop GUI tool.
