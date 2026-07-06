@@ -261,7 +261,7 @@ class DSComicViewerGUI:
         top_bar = ttk.Frame(self.root, padding=6)
         top_bar.pack(side=tk.TOP, fill=tk.X)
 
-        btn_import = ttk.Button(top_bar, text="📁 Import", style="Large.TButton", command=self.open_manga_dir)
+        btn_import = ttk.Button(top_bar, text="📁 Import Img", style="Large.TButton", command=self.open_manga_dir)
         btn_import.pack(side=tk.LEFT, fill=tk.X, expand=True, padx=2, ipady=8)
 
         self.btn_import_pdf = ttk.Button(

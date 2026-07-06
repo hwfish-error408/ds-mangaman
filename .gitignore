@@ -4,6 +4,10 @@ build/
 *.map
 *.nds
 
+# pyinstaller shit
+dist/
+__pycache__/
+
 # assets shit
 assets/jpg_comic/
 assets/nitrofiles/
