@@ -170,7 +170,7 @@ class PdfImportDialog(tk.Toplevel):
         self.pages_entry.grid(row=2, column=1, sticky=tk.W, **pad)
 
         ttk.Label(frm, text="First chapter (id):").grid(row=3, column=0, sticky=tk.W, **pad)
-        self.start_chap_var = tk.StringVar(value="10")
+        self.start_chap_var = tk.StringVar(value="0010")
         ttk.Entry(frm, textvariable=self.start_chap_var, width=10).grid(row=3, column=1, sticky=tk.W, **pad)
 
         ttk.Label(frm, text="Image format:").grid(row=4, column=0, sticky=tk.W, **pad)
@@ -180,18 +180,14 @@ class PdfImportDialog(tk.Toplevel):
             values=["jpg", "png", "webp"],
         ).grid(row=4, column=1, sticky=tk.W, **pad)
 
-        ttk.Label(frm, text="Rendering DPI:").grid(row=5, column=0, sticky=tk.W, **pad)
-        self.dpi_var = tk.StringVar(value="200")
-        ttk.Entry(frm, textvariable=self.dpi_var, width=10).grid(row=5, column=1, sticky=tk.W, **pad)
-
         self.raw_var = tk.BooleanVar(value=True)
         ttk.Checkbutton(
             frm, variable=self.raw_var,
             text="Prefer embedded original image (if present) instead of re-rendering"
-        ).grid(row=6, column=0, columnspan=2, sticky=tk.W, **pad)
+        ).grid(row=5, column=0, columnspan=2, sticky=tk.W, **pad)
 
         btn_bar = ttk.Frame(frm)
-        btn_bar.grid(row=7, column=0, columnspan=2, sticky=tk.E, pady=(10, 0))
+        btn_bar.grid(row=6, column=0, columnspan=2, sticky=tk.E, pady=(10, 0))
         ttk.Button(btn_bar, text="Cancel", command=self._on_cancel).pack(side=tk.RIGHT, padx=4)
         ttk.Button(btn_bar, text="Import", command=self._on_confirm).pack(side=tk.RIGHT, padx=4)
 
@@ -208,10 +204,9 @@ class PdfImportDialog(tk.Toplevel):
 
         try:
             start_chapter = int(self.start_chap_var.get())
-            dpi = int(self.dpi_var.get())
             pages_per_chapter = int(self.pages_var.get()) if mode == "split" else None
         except ValueError:
-            messagebox.showerror("Invalid value", "Check that chapter id, DPI, and pages/chapter are integer numbers.")
+            messagebox.showerror("Invalid value", "Check that chapter id and pages/chapter are integer numbers.")
             return
 
         if mode == "split" and (not pages_per_chapter or pages_per_chapter < 1):
@@ -223,7 +218,6 @@ class PdfImportDialog(tk.Toplevel):
             pages_per_chapter=pages_per_chapter,
             start_chapter=start_chapter,
             img_format=self.format_var.get(),
-            dpi=dpi,
             raw=self.raw_var.get(),
         )
         self.destroy()
@@ -343,7 +337,7 @@ class DSComicViewerGUI:
         opts = dialog.result
         self.print_log(f">>> Starting PDF import: {os.path.basename(pdf_path)}")
         self.print_log(f"[PDF] Mode={opts['mode']}  format={opts['img_format']}  "
-                       f"dpi={opts['dpi']}  first_chapter={opts['start_chapter']:04d}  raw={opts['raw']}")
+                       f"first_chapter={opts['start_chapter']:04d}  raw={opts['raw']}")
 
         self.btn_import_pdf.configure(state='disabled')
         threading.Thread(
@@ -368,7 +362,6 @@ class DSComicViewerGUI:
                 pages_per_chapter=opts['pages_per_chapter'],
                 start_chapter=opts['start_chapter'],
                 img_format=opts['img_format'],
-                dpi=opts['dpi'],
                 raw=opts['raw'],
                 progress_cb=progress_cb,
             )

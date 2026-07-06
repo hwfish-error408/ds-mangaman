@@ -31,10 +31,7 @@ import sys
 from dataclasses import dataclass, field
 from typing import Callable, List, Optional, Tuple
 
-try:
-    import fitz  # PyMuPDF
-except ImportError:  # pragma: no cover - reported nicely at runtime
-    fitz = None
+import fitz  # PyMuPDF
 
 
 SUPPORTED_FORMATS = ("jpg", "png", "webp")
@@ -73,14 +70,6 @@ class ImportResult:
 # --------------------------------------------------------------------------- #
 # Internal utilities
 # --------------------------------------------------------------------------- #
-
-def _require_fitz() -> None:
-    if fitz is None:
-        raise PdfImportError(
-            "PyMuPDF is not installed. Install it with:\n"
-            "    pip install pymupdf"
-        )
-
 
 def _validate_format(fmt: str) -> str:
     fmt = fmt.lower().lstrip(".")
@@ -249,7 +238,6 @@ def import_pdf(
 
     Returns an ImportResult containing the generated (folder, n_pages) list.
     """
-    _require_fitz()
     fmt = _validate_format(img_format)
 
     if not os.path.isfile(pdf_path):
@@ -258,6 +246,14 @@ def import_pdf(
     os.makedirs(out_base, exist_ok=True)
 
     result = ImportResult()
+
+    if start_chapter % chapter_step != 0:
+        rounded = ((start_chapter + chapter_step - 1) // chapter_step) * chapter_step
+        result.warnings.append(
+            f"Start chapter {start_chapter:04d} is not a multiple of the chapter step "
+            f"({chapter_step}): rounded up to {rounded:04d}."
+        )
+        start_chapter = rounded
 
     doc = fitz.open(pdf_path)
     try:

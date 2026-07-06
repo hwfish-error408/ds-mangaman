@@ -35,10 +35,13 @@ DS Mangamanは、完美なエンドツーエンドのアーキテクチャによ
 * **3x Ultra-HD Rendering Matrix**: Converts source images into 768x576 assets, providing raw details that far exceed standard NDS screen limitations.
 * **Touch Radar Magnifier**: Pressing the stylus on the bottom screen instantly shifts the top screen into an ultra-high-resolution magnifying glass focused on the exact pixel coordinates, paired with a dynamic tracking bounding box.
 
+## Building from Source
 
+If you're running `main_gui.py` directly instead of the packaged `main_gui.exe`, install the Python dependencies first:
 
-
-
+```
+pip install -r requirements.txt
+```
 
 ## Usage Tutorial
 
@@ -58,7 +61,7 @@ The compilation pipeline relies on the official devkitPro build ecosystem.
 ### Step 2: Import Manga Assets
 1. Click the **Import** button on the graphical user interface. The application will automatically open your local manga repository directory located at `assets/jpg_comic/`.
 2. Create subfolders strictly named with **4-digit integers** to represent chapter identifiers (e.g., name Chapter 1 as `0010`, Chapter 2 as `0020`, etc.).
-3. Place your manga panels into their respective folders. Images must be sorted sequentially by page numbers (mainstream modern formats such as `.jpg`, `.png`, and `.webp` are fully supported). I will upload a web manga downloader chrome extension shortly (mainly for major english and traditional chinese pirate websites) making it a lot easier.
+3. Place your manga panels into their respective folders. Images must be sorted sequentially by page numbers (mainstream modern formats such as `.jpg`, `.png`, and `.webp` are fully supported). 
 
 ```
 assets/jpg_comic/
@@ -69,6 +72,15 @@ assets/jpg_comic/
     ├── 001.png
     └── 002.png
 ```
+
+4. **Alternative: Import directly from a PDF.** Instead of manually preparing folders, click the **Import PDF** button, select a manga PDF, and configure the import dialog:
+   * **Chapter mode**: `single` (the whole PDF becomes one chapter), `split` (a new chapter every N pages), or `toc` (one chapter per top-level bookmark in the PDF).
+   * **Pages per chapter**: only used in `split` mode.
+   * **First chapter (id)**: the starting 4-digit chapter folder name, e.g. `0010`.
+   * **Image format**: `jpg`, `png`, or `webp`. Note that this setting will not affect final result in the ROM.
+   * **Prefer embedded original image**: if the PDF pages are scans (one embedded image per page), this extracts the original image directly instead of re-rendering it, avoiding any quality loss.
+
+   Clicking **Import** generates the chapter folders automatically under `assets/jpg_comic/`, ready for Step 3.
 
 ### Step 3: Package & Generate ROM
 1. Once your images are properly placed, return to the GUI and click the **Refresh** button. The chapter list view on the right will update to display your detected chapter IDs and total page counts.
