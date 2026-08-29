@@ -1,92 +1,137 @@
-# DS Mangaman
+# DS-Mangaman
 
+DS-Mangaman is a DSi-only dual-screen comic and document reader. One page is
+displayed across a logical 256 x 384 viewport, with the upper half on
+the top LCD and the lower half on the touchscreen LCD.
+
+Books are stored as external files on the SD card. The reusable reader ROM is
+about 250 KiB, so launching a 300 MiB book no longer requires the loader to
+scan a 300 MiB NitroFS ROM. Page textures use Nintendo LZ10 compression and are
+expanded only after the selected page is read. At minimum zoom, the reader
+loads only the small filtered preview; the detailed texture is loaded when you
+zoom in.
+
+## Controls
+
+| Control | Action |
+|---|---|
+| Touch drag | Move the page directly |
+| D-pad | Pan the view; the page moves opposite the pressed direction |
+| X / Y | Next / previous page, crossing chapter boundaries |
+| L | Rotate the image view 90 degrees clockwise |
+| R | Rotate the image view 90 degrees counterclockwise |
+| SELECT | Zoom in |
+| START | Zoom out |
+| START + SELECT | Open the book picker; B cancels |
+| A | Reset to minimum zoom and center the page |
+| B | Open the chapter-local page-number dialog |
+
+The page can move outside the viewport. Areas beyond it are white, and motion
+stops only when the page reaches the opposite viewport boundary.
+The D-pad axes rotate with the image view, while touch dragging continues to
+move the page directly under the finger.
+
+## Export a book
+
+Run `main_gui.py`, enter a **Book name**, choose the chapters and preprocessing
+options, then click **Export Book + Reader**. The result is:
+
+```text
+build/sd_card/
+├── DS-Mangaman.nds
+└── ds-mangaman/
+    └── books/
+        └── example-book/
+            ├── book.cfg
+            ├── 0010/
+            │   ├── page001_full.dsm
+            │   └── page001_preview.dsm
+            └── ...
 ```
-Touch screen      -->      Zoom in
-D-pad up          -->      Next page
-D-pad down        -->      Last page
-L                 -->      Next chapter
-R                 -->      Last chapter
-START             -->      Decrease zoom ratio
-SELECT            -->      Increase zoom ratio
+
+Copy both `DS-Mangaman.nds` and the `ds-mangaman` folder to the root of the DSi
+SD card. Launch `DS-Mangaman.nds` in DSi mode. If one valid book is present it
+opens automatically; if several are present, choose one with the D-pad and A.
+
+Exporting another name adds another book. Exporting the same normalized name
+replaces only that book. The GUI stages and validates all pages before exposing
+the replacement, and preserves the previous book and reader if export fails.
+
+The compressed format uses the `DS_MANGAMAN_BOOK_V3_ASSET` manifest. Books made
+with an older raw or LZ-only format must be exported again with the current
+GUI; the reader rejects them instead of interpreting incompatible pixels.
+
+Each `book.cfg` also contains a fixed-width resume entry such as:
+
+```text
+last_position=0010:0000000025
 ```
 
-A high-performance, hardware-accelerated 3x Ultra-HD comic book reader for the Nintendo DS. It includes an integrated Python-based preprocessing pipeline packaged into a standalone desktop GUI tool.
+The first number is the chapter folder and the second is its page. After a page
+loads successfully, the reader updates this entry on the SD card. Opening the
+book again therefore resumes on that page. Older V3 books without the entry
+still open at their first page and receive the entry after page navigation.
 
----
+Do not launch an older, hundreds-of-megabytes per-book ROM: those files still
+contain embedded page data and retain the old long startup behavior.
 
-通过完美的端到端架构，DS Mangaman 彻底打破了复古硬件的物理制约。在任天堂 DS 掌机上通过底层 C++ 定点数硬件加速，实现了前所未有的 3 倍超清双屏动态无损漫画阅读体验。这不仅是一次卓越的逆向性能调优，更是一套将现代高精数字化资产无缝注入老旧硬件的终极闭环解决方案。
+## Image sources
 
----
+Source chapters live below `assets/jpg_comic/` in four-digit folders:
 
-DS Mangamanは、完美なエンドツーエンドのアーキテクチャにより、レトロハードウェアの物理的制約を完全に打ち破ります。さらにニンテンドーDS実機上では、低層の C++ 固定小数点数によるハードウェア加速を通じて、かつてない 3倍超高画質のデュアルスクリーン動的マンガ閲覧体験を実現しました。これは単なるパフォーマンスの最適化に留まらず、旧世代 of ハードウェアに現代のデジタル資産の生命力を吹き込む、究極のソリューションです。
-
-<div align="center">
-  <img src="./demo/demo.jpg" width="50%" alt="demo演示デモ">
-</div>
-
-## Common Issues
-
-* **File Path Spaces (Compilation Failure)**: The devkitPro toolchain and GNU `make` cannot handle directory paths containing spaces (e.g., `C:\Users\Charles Wong\Downloads`). If you encounter a `No rule to make target` error, simply move the entire project folder to a path with no spaces, such as `C:\ds_mangaman\` or `D:\ds_mangaman\`.
-* **Mandatory Installation Path (Detection Failure)**: The script validates environmental footprints using a hardcoded array of default paths, targeting `C:\devkitPro`. Installing the development toolchain into a custom path or alternative drive letter is the same as not installing; if a non-default directory is explicitly required, open a GitHub Issue so administrators can append your custom path matrix to the lookup table.
-
-## Features
-
-* **Flashcard & Virtual Filesystem Independence**: By embedding manga assets directly into the inner `.nds` ROM structure via NitroFS, the system bypasses any reliance on specific R4 card FAT kernels, or external virtual filesystem clusters, meaning that it's stable on all avaliable flashcart platforms.
-* **3x Ultra-HD Rendering Matrix**: Converts source images into 768x576 assets, providing raw details that far exceed standard NDS screen limitations.
-* **Touch Radar Magnifier**: Pressing the stylus on the bottom screen instantly shifts the top screen into an ultra-high-resolution magnifying glass focused on the exact pixel coordinates, paired with a dynamic tracking bounding box.
-
-## Building from Source
-
-If you're running `main_gui.py` directly instead of the packaged `main_gui.exe`, install the Python dependencies first:
-
-```
-pip install -r requirements.txt
-```
-
-## Usage Tutorial
-
-You no longer need to manually configure Python, pip, or global environment variables via the command line. Follow these steps to generate your custom comic `.nds` ROM on any Windows PC.
-
-<div align="center">
-  <img src="./demo/gui_demo.jpg" width="50%" alt="demo演示デモ">
-</div>
-
-### Step 1: Toolchain Setup
-The compilation pipeline relies on the official devkitPro build ecosystem.
-1. Double-click to run `main_gui.exe` in the release package. If the development toolchain is not detected on your local drives, the application will automatically pop up a dialog to guide you through the setup process.
-2. Alternatively, you can directly execute `assets/devkitProUpdater-3.0.3.exe`. In the component selection window, make sure that NDS Development is checked.
-3. **Mandatory Installation Path (CRITICAL):** You MUST keep the default installation directory as `C:\devkitPro`! Do not customize or change the path to other drive letters during the installation wizard, otherwise the orchestration program will fail to intercept and dynamically inject the active build environments.
-4. **Special Requirements Note:** If you have absolute hardware installation constraints and must change the installation drive or path, please submit an Issue directly on the GitHub project page. Administrator will append your custom path to the automatic detection lookup table in the next release.
-
-### Step 2: Import Manga Assets
-1. Click the **Import** button on the graphical user interface. The application will automatically open your local manga repository directory located at `assets/jpg_comic/`.
-2. Create subfolders strictly named with **4-digit integers** to represent chapter identifiers (e.g., name Chapter 1 as `0010`, Chapter 2 as `0020`, etc.).
-3. Place your manga panels into their respective folders. Images must be sorted sequentially by page numbers (mainstream modern formats such as `.jpg`, `.png`, and `.webp` are fully supported). 
-
-```
+```text
 assets/jpg_comic/
-├── 0010/ (Chapter 1 folder)
-│   ├── 001.jpg
-│   ├── 002.jpg
-└── 0022/ (Chapter 2b folder)
-    ├── 001.png
-    └── 002.png
+├── 0010/
+│   ├── 1.jpg
+│   ├── 2.jpg
+│   └── 10.jpg
+└── 0020/
+    └── 1.png
 ```
 
-4. **Alternative: Import directly from a PDF.** Instead of manually preparing folders, click the **Import PDF** button, select a manga PDF, and configure the import dialog:
-   * **Chapter mode**: `single` (the whole PDF becomes one chapter), `split` (a new chapter every N pages), or `toc` (one chapter per top-level bookmark in the PDF).
-   * **Pages per chapter**: only used in `split` mode.
-   * **First chapter (id)**: the starting 4-digit chapter folder name, e.g. `0010`.
-   * **Image format**: `jpg`, `png`, or `webp`. Note that this setting will not affect final result in the ROM.
-   * **Prefer embedded original image**: if the PDF pages are scans (one embedded image per page), this extracts the original image directly instead of re-rendering it, avoiding any quality loss.
+Filenames are naturally sorted, so `2.jpg` precedes `10.jpg`. The PDF importer
+can create these chapter folders from a PDF.
 
-   Clicking **Import** generates the chapter folders automatically under `assets/jpg_comic/`, ready for Step 3.
+The recommended settings for text and line art are **Fit entire page**,
+**White**, **Lanczos**, **Crisp text / manga**, and **Compact 256 colors**.
+Every page produces:
 
-### Step 3: Package & Generate ROM
-1. Once your images are properly placed, return to the GUI and click the **Refresh** button. The chapter list view on the right will update to display your detected chapter IDs and total page counts.
-2. **Select Compilation Target:**
-   * You can multi-select any subset of chapters in the list by holding down `Ctrl` or `Shift` to package a custom set of chapters into the ROM.
-   * If no specific items are selected, clicking compile will automatically package all discovered chapters in the list.
-3. Click the **Gen ROM** button.
-4. **Automated Closed-Loop Execution:** The main program will handle NumPy-accelerated image rotation and compression, transcode RGB888 source images to hardware-native 16-bit RGB555 format, build the NitroFS filesystem structure, and silently invoke the underlying devkitARM compiler tools.
-5. Upon successful compilation, the software will automatically open the `build/` directory for you, revealing your newly generated `.nds` ROM file ready to be loaded into your NDS flashcard or emulator!
+- a gently sharpened 960 x 1440 detailed texture;
+- a separately filtered 256 x 384 minimum-zoom preview;
+- an LZ10-compressed stream for each texture.
+
+Compact mode quantizes each page to its own 256-color palette before lossless
+LZ10 compression. Full-color mode instead stores every texture as RGB555.
+
+The former raw format always consumed 1.875 MiB per page. Compressed size now
+depends on page contents. **Compact 256 colors**, the recommended default for
+books and manga, uses a page-specific palette and occupied about 0.34 MiB for
+the representative mathematical page used during validation—roughly 82% less
+than the old raw assets. **Full color RGB555** retained all 15-bit colors and
+occupied about 0.58 MiB for that page, roughly 69% less. A 426-page book with
+similar content is therefore approximately 146 MiB in Compact mode or 247 MiB
+in Full-color mode instead of about 799 MiB raw; exact results vary by page.
+
+Maximum zoom bilinearly reduces a 320 x 480 crop to the 256 x 384 LCD viewport,
+which smooths text edges while keeping the same apparent 3x magnification.
+
+## Requirements and building
+
+- A Nintendo DSi running the application in DSi mode.
+- devkitPro with the NDS development group (devkitARM, libnds, Calico, libfat,
+  ndstool, and grit).
+- Python 3 with the packages in `requirements.txt`; Linux also needs its Tk
+  package, commonly `python3-tk`.
+
+The GUI discovers `DEVKITPRO`, `/opt/devkitpro`, and standard Windows devkitPro
+locations. Repository paths containing spaces or parentheses are supported.
+
+To build only the reusable reader from a shell:
+
+```sh
+make TARGET=build/DS-Mangaman
+```
+
+The reader mounts the SD card with libfat and looks only below
+`/ds-mangaman/books`. It does not embed or scan the generated books during ROM
+startup.
